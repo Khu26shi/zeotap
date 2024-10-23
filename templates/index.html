@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule Engine</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Simple Rule Engine</h1>
+        <!-- Form to create rule -->
+        <form id="rule-form" method="POST">
+            <div class="form-group">
+                <label for="rule">Enter Rule:</label>
+                <input type="text" class="form-control" id="rule" name="rule" placeholder="e.g. age > 30 AND department == 'Sales'">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="createRule()">Create Rule</button>
+        </form>
+
+        <!-- Form to evaluate data -->
+        <h2 class="mt-5">Evaluate Rules</h2>
+        <form id="evaluate-form" method="POST">
+            <div class="form-group">
+                <label for="data">Enter User Data (JSON):</label>
+                <textarea class="form-control" id="data" name="data" rows="5" placeholder='{"age": 35, "department": "Sales", "salary": 60000}'></textarea>
+            </div>
+            <button type="button" class="btn btn-success" onclick="evaluateRule()">Evaluate Rule</button>
+        </form>
+
+        <div id="result" class="mt-3"></div>
+    </div>
+
+    <!-- JS for AJAX requests -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function createRule() {
+            const rule = $('#rule').val();
+            $.post('/create_rule', { rule: rule }, function(response) {
+                alert(response.message || response.error);
+            });
+        }
+
+        function evaluateRule() {
+            const data = $('#data').val();
+            $.ajax({
+                url: '/evaluate_rule',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(JSON.parse(data)),
+                success: function(response) {
+                    $('#result').text('Evaluation result: ' + response.result);
+                },
+                error: function(response) {
+                    alert(response.responseJSON.error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
